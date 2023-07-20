@@ -107,24 +107,7 @@ const qmarksTestNoExtDot = ([$0]: RegExpMatchArray) => {
   return (f: string) => f.length === len && f !== '.' && f !== '..'
 }
 
-/* c8 ignore start */
-const defaultPlatform: Platform = (
-  typeof process === 'object' && process
-    ? (typeof process.env === 'object' &&
-        process.env &&
-        process.env.__MINIMATCH_TESTING_PLATFORM__) ||
-      process.platform
-    : 'posix'
-) as Platform
-type Sep = '\\' | '/'
-const path: { [k: string]: { sep: Sep } } = {
-  win32: { sep: '\\' },
-  posix: { sep: '/' },
-}
-/* c8 ignore stop */
-
-export const sep = defaultPlatform === 'win32' ? path.win32.sep : path.posix.sep
-minimatch.sep = sep
+export const sep = '/'
 
 export const GLOBSTAR = Symbol('globstar **')
 minimatch.GLOBSTAR = GLOBSTAR
@@ -214,7 +197,7 @@ export const defaults = (def: MinimatchOptions): typeof minimatch => {
     match: (list: string[], pattern: string, options: MinimatchOptions = {}) =>
       orig.match(list, pattern, ext(def, options)),
 
-    sep: orig.sep,
+    sep: '/',
     GLOBSTAR: GLOBSTAR as typeof GLOBSTAR,
   })
 }
@@ -317,7 +300,7 @@ export class Minimatch {
     options = options || {}
     this.options = options
     this.pattern = pattern
-    this.platform = options.platform || defaultPlatform
+    this.platform = options.platform || 'win32'
     this.isWindows = this.platform === 'win32'
     this.windowsPathsNoEscape =
       !!options.windowsPathsNoEscape || options.allowWindowsEscape === false
@@ -786,7 +769,7 @@ export class Minimatch {
         if (fd.toLowerCase() === pd.toLowerCase()) {
           pattern[pdi] = fd
           if (pdi > fdi) {
-            pattern = pattern.slice( pdi)
+            pattern = pattern.slice(pdi)
           } else if (fdi > pdi) {
             file = file.slice(fdi)
           }
